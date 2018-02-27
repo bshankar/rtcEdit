@@ -5,6 +5,7 @@ const uuidv4 = require('uuid/v4')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const { onJoin, onLeave } = require('./signal')
 
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -26,6 +27,8 @@ app.get('/generate', function (req, res) {
 
 io.on('connection', function (socket) {
   console.log('A user connected')
+  socket.on('join', (data) => onJoin(data, socket))
+  socket.on('leave', (data) => onLeave(data))
 })
 
 server.listen(port, function () {
