@@ -9,8 +9,11 @@ function onJoin (data, socket) {
   const doc = docs[docId]
   if (doc && !(userId in doc)) {
     doc[userId] = socket
+    const users = Object.keys(doc)
+    Object.values(doc).forEach(s => s.emit('user joined', {users: users, docId: docId}))
   } else if (!doc) {
     docs[docId] = {[userId]: socket}
+    socket.emit('user joined', {users: [userId], docId: docId})
   } else {
     socket.emit('join error', 'user already exists')
   }
@@ -20,11 +23,14 @@ function onLeave (data, socket) {
   const docId = data.docId
   const userId = data.userId
   console.log('User ' + userId + ' leaving document ' + docId)
-  if (docs[docId]) {
-    if (docs[docId][userId]) {
-      delete docs[docId][userId]
+  const doc = docs[docId]
+  if (doc) {
+    if (doc[userId]) {
+      delete doc[userId]
+      const users = Object.keys(doc)
+      Object.values(doc).forEach(s => s.emit('user left', {users: users, docId: docId}))
     }
-    if (Object.keys(docs[docId]).length === 0) {
+    if (Object.keys(doc).length === 0) {
       delete docs[docId]
     }
   }
