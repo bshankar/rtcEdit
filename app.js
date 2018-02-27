@@ -2,15 +2,21 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const uuidv4 = require('uuid/v4')
-
 const app = express()
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
+
 app.use(express.static('public'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 const port = process.env.PORT || 9000
 
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '/view/home.html'))
+})
+
 app.get('/document/:documentid', function (req, res) {
-  res.sendFile(path.join(__dirname, 'public/index.html'))
+  res.sendFile(path.join(__dirname, '/view/index.html'))
 })
 
 app.get('/generate', function (req, res) {
@@ -18,10 +24,10 @@ app.get('/generate', function (req, res) {
   res.redirect('/document/' + documentid)
 })
 
-app.all('*', function (req, res) {
-  res.redirect('/')
+io.on('connection', function (socket) {
+  console.log('A user connected')
 })
 
-app.listen(port, function () {
+server.listen(port, function () {
   console.log('Listening on port ' + port)
 })
