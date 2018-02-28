@@ -2,6 +2,7 @@ class Peer {
   constructor () {
     this.pc = new RTCPeerConnection(null)
     this.pc.onicecandidate = event => this.onicecandidate(event)
+    this.iceCandidates = []
     this.createOffer()
   }
 
@@ -16,7 +17,7 @@ class Peer {
 
   onicecandidate (event) {
     if (event.candidate) {
-      sendMessage('ice candidate', {
+      this.iceCandidates.push({
         type: 'candidate',
         docId: docId,
         label: event.candidate.sdpMLineIndex,
@@ -24,6 +25,8 @@ class Peer {
         candidate: event.candidate.candidate,
         foundation: event.candidate.foundation
       })
+    } else {
+      sendMessage('ice candidates', this.iceCandidates)
     }
   }
 

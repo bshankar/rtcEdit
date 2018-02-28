@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-const { onJoin, onLeave, onRecieveIceCandidate } = require('./signal')
+const { onJoin, onLeave, onRecieveIceCandidates } = require('./signal')
 
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -29,7 +29,7 @@ io.on('connection', function (socket) {
   console.log('A user connected')
   socket.on('join', data => onJoin(data, socket))
   socket.on('leave', data => onLeave(data))
-  socket.on('ice candidate', data => onRecieveIceCandidate(data, socket))
+  socket.on('ice candidates', data => onRecieveIceCandidates(data, socket))
 })
 
 server.listen(port, function () {

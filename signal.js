@@ -36,13 +36,11 @@ function onLeave (data, socket) {
   }
 }
 
-function onRecieveIceCandidate (data, socket) {
-  // broadcast it to other peers in the same buffer
-  console.log('server got ice', data)
+function onRecieveIceCandidates (data, socket) {
   const docId = data.docId
   Object.values(docs[docId])
     .filter(s => s.id !== socket.id)
-    .forEach(s => s.emit('ice candidate', {...data, userId: socket.id}))
+    .forEach(s => s.emit('ice candidates', {...data, userId: socket.id}))
 }
 
-module.exports = { onJoin, onLeave, onRecieveIceCandidate }
+module.exports = { onJoin, onLeave, onRecieveIceCandidates }

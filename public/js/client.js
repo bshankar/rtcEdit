@@ -29,8 +29,8 @@ socket.on('connect', function () {
     }
   })
 
-  socket.on('ice candidate', function (data) {
-    console.log('received other ice candidate', data)
+  socket.on('ice candidates', function (data) {
+    console.log('received other peer\'s ice candidates', data)
   })
 })
 
