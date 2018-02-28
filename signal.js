@@ -42,7 +42,7 @@ function onRecieveIceCandidate (data, socket) {
   const docId = data.docId
   Object.values(docs[docId])
     .filter(s => s.id !== socket.id)
-    .forEach(s => s.emit('ice candidate', data))
+    .forEach(s => s.emit('ice candidate', {...data, userId: socket.id}))
 }
 
 module.exports = { onJoin, onLeave, onRecieveIceCandidate }
