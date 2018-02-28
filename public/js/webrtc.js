@@ -19,7 +19,6 @@ class Peer {
     if (event.candidate) {
       this.iceCandidates.push({
         type: 'candidate',
-        docId: docId,
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
