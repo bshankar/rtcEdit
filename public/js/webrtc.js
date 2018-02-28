@@ -1,22 +1,30 @@
 class Peer {
   constructor () {
-    this.pc = null
-    this.iceCandidates = []
-    this.createConnection()
+    this.pc = new RTCPeerConnection(null)
+    this.pc.onicecandidate = event => this.onicecandidate(event)
+    this.createOffer()
   }
 
-  createConnection (id, sendMessage) {
-    this.pc = new RTCPeerConnection(null)
-    this.pc.onicecandidate = function (event) {
-      if (event.candidate) console.log(event)
-    }
-
+  createOffer () {
     this.pc.createOffer(this.getSdpConstraints())
-      .then(offer => { console.log(offer); this.pc.setLocalDescription(offer) })
+      .then(offer => this.pc.setLocalDescription(offer))
       .then(() => { console.log('offer created') })
       .catch(function (reason) {
         console.log('error creating offer. reason: ', reason)
       })
+  }
+
+  onicecandidate (event) {
+    if (event.candidate) {
+      sendMessage('ice candidate', {
+        type: 'candidate',
+        docId: docId,
+        label: event.candidate.sdpMLineIndex,
+        id: event.candidate.sdpMid,
+        candidate: event.candidate.candidate,
+        foundation: event.candidate.foundation
+      })
+    }
   }
 
   getSdpConstraints () {
