@@ -39,7 +39,7 @@ io.on('connection', function (socket) {
   })
 
   socket.on('message', data => {
-    io.to(data.docId).emit('message', {...data, userId: socket.id})
+    io.to(data.docId).emit('message', {from: socket.id, ...data})
   })
 })
 

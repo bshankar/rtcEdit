@@ -21,7 +21,17 @@ function onUserLeft (data) {
 }
 
 function onMessage (data) {
+  if (socket.id !== data.from) {
+    console.log('got data ', data)
+  }
+}
 
+function sendMessage (type, data) {
+  socket.emit('message', {
+    type: type,
+    docId: docId,
+    data: data
+  })
 }
 
 function renderUsers (users) {

@@ -6,13 +6,13 @@ class Peer {
     this.createOffer()
   }
 
-  createOffer () {
-    this.pc.createOffer(this.getSdpConstraints())
-      .then(offer => this.pc.setLocalDescription(offer))
-      .then(() => { console.log('offer created') })
-      .catch(function (reason) {
-        console.log('error creating offer. reason: ', reason)
-      })
+  async createOffer () {
+    try {
+      const offer = await this.pc.createOffer(this.sdpConstraints())
+      this.pc.setLocalDescription(offer)
+    } catch (e) {
+      console.error('Creating offer failed. Reason: ', e)
+    }
   }
 
   onicecandidate (event) {
@@ -25,7 +25,8 @@ class Peer {
         foundation: event.candidate.foundation
       })
     } else {
-      sendMessage('ice candidates', this.iceCandidates)
+      sendMessage('ice', this.iceCandidates)
+      this.iceCandidates = []
     }
   }
 
@@ -57,7 +58,7 @@ class Peer {
 
   // }
 
-  getSdpConstraints () {
+  sdpConstraints () {
     return ({
       mandatory: {
         'OfferToReceiveAudio': true,
@@ -68,3 +69,5 @@ class Peer {
     })
   }
 }
+
+const peer = new Peer()
