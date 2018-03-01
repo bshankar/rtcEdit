@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-const { onJoin, onLeave, onRecieveIceCandidates } = require('./signal')
+const { getUsers } = require('./util')
 
 app.use(express.static('public'))
 app.use(bodyParser.json())
@@ -16,22 +16,33 @@ app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, '/view/home.html'))
 })
 
-app.get('/document/:documentid', function (req, res) {
+app.get('/generate', function (req, res) {
+  const docId = uuidv4().slice(0, 8)
+  res.redirect('/' + docId)
+})
+
+app.get('/:docId', function (req, res) {
   res.sendFile(path.join(__dirname, '/view/index.html'))
 })
 
-app.get('/generate', function (req, res) {
-  const documentid = uuidv4().slice(0, 8)
-  res.redirect('/document/' + documentid)
-})
-
 io.on('connection', function (socket) {
-  console.log('A user connected')
-  socket.on('join', data => onJoin(data, socket))
-  socket.on('leave', data => onLeave(data))
-  socket.on('ice candidates', data => onRecieveIceCandidates(data, socket))
+  console.log(socket.id + ' connected')
+
+  socket.on('join room', data => {
+    socket.join(data.docId)
+    io.to(data.docId).emit('user joined', getUsers(io, data.docId))
+  })
+
+  socket.on('leave room', data => {
+    socket.leave(data.docId)
+    io.to(data.docId).emit('user left', getUsers(io, data.docId))
+  })
+
+  socket.on('message', data => {
+    io.to(data.docId).emit('message', {...data, userId: socket.id})
+  })
 })
 
 server.listen(port, function () {
-  console.log('Listening on port ' + port)
+  console.log('Listening on port ' + port, '\n')
 })

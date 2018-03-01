@@ -29,6 +29,34 @@ class Peer {
     }
   }
 
+  // onIceCandidates (data) {
+  //   if (data.type === 'offer') {
+  //     this.pc.createAnswer(this.onLocalSessionCreated)
+  //   }
+  //   const peer = this
+  //   this.pc.setRemoteDescription(new RTCSessionDescription(data))
+  //     .then(peer.addRemoteIceCandidates(data))
+  //     .catch(console.error('Error setting remote description!'))
+  // }
+
+  // addRemoteIceCandidates (data) {
+  //   console.log('Adding remote ice candidates and creating answer')
+  //   data.iceCandidates.forEach((ic) => {
+  //     const candidate = new RTCIceCandidate({
+  //       sdpMLineIndex: ic.label,
+  //       sdpMid: ic.id,
+  //       candidate: ic.candidate
+  //     })
+  //     this.pc.addIceCandidate(candidate)
+  //       .then(() => console.log('Added ice candidate'))
+  //       .catch(e => console.error('Error: adding ice candidate failed', e))
+  //   })
+  // }
+
+  // onLocalSessionCreated () {
+
+  // }
+
   getSdpConstraints () {
     return ({
       mandatory: {
@@ -40,5 +68,3 @@ class Peer {
     })
   }
 }
-
-const peer = new Peer()

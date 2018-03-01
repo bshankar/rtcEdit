@@ -1,45 +1,27 @@
 const socket = io()
 const $ = x => document.getElementById(x)
-const docId = window.location.pathname.split('/')[2]
-
-function getMsg (userId, docId) {
-  return {userId: userId, docId: docId}
-}
+const docId = window.location.pathname.split('/')[1]
 
 socket.on('connect', function () {
-  socket.emit('join', getMsg(socket.id, docId))
-
+  socket.emit('join room', {docId: docId})
+  socket.on('user joined', data => onUserJoined(data))
+  socket.on('user left', data => onUserLeft(data))
+  socket.on('message', data => onMessage(data))
   window.onbeforeunload = function () {
-    socket.emit('leave', getMsg(socket.id, docId))
+    socket.emit('leave room', {docId: docId})
   }
-
-  socket.on('join error', function () {
-    console.log('Network error!')
-  })
-
-  socket.on('user joined', function (data) {
-    if (data.docId === docId) {
-      renderUsers(data.users)
-    }
-  })
-
-  socket.on('user left', function (data) {
-    if (data.docId === docId) {
-      renderUsers(data.users)
-    }
-  })
-
-  socket.on('ice candidates', function (data) {
-    console.log('received other peer\'s ice candidates', data)
-  })
 })
 
-function sendMessage (event, data) {
-  if (socket.connected === true) {
-    socket.emit(event, {...data, docId: docId})
-  } else {
-    console.error('Error sending message. Socket is not connected!')
-  }
+function onUserJoined (data) {
+  renderUsers(data.users)
+}
+
+function onUserLeft (data) {
+  renderUsers(data.users)
+}
+
+function onMessage (data) {
+
 }
 
 function renderUsers (users) {
