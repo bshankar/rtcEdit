@@ -1,4 +1,4 @@
-function getUsers (io, room) {
+function getUsers (room, io) {
   const _room = io.sockets.adapter.rooms[room]
   if (_room) {
     const sockets = _room['sockets']
@@ -6,4 +6,9 @@ function getUsers (io, room) {
   }
 }
 
-module.exports = { getUsers }
+function findSocket (id, room, io) {
+  const _room = io.sockets.adapter.rooms[room]
+  return _room[id]
+}
+
+module.exports = { getUsers, findSocket }
