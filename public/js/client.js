@@ -12,8 +12,16 @@ socket.on('connect', function () {
   }
 })
 
+function joinedExistingRoom (data) {
+  return data.users[data.users.length - 1] === socket.id &&
+    data.users.length > 1
+}
+
 function onUserJoined (data) {
   renderUsers(data.users)
+  if (joinedExistingRoom(data)) {
+    peer.offer()
+  }
 }
 
 function onUserLeft (data) {
@@ -21,14 +29,14 @@ function onUserLeft (data) {
 }
 
 function onMessage (data) {
-  if (socket.id !== data.from) {
-    console.log('got data ', data)
-  }
+  console.log('got data ', data)
+  peer.onSignalingMessage(data)
 }
 
-function sendMessage (type, data) {
+function sendMessage (type, data, to) {
   socket.emit('message', {
     type: type,
+    to: to,
     docId: docId,
     data: data
   })
