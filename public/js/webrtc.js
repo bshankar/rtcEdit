@@ -2,14 +2,15 @@ class Peer {
   constructor () {
     this.pc = new RTCPeerConnection(null)
     this.pc.onicecandidate = event => this.onicecandidate(event)
-    this.iceCandidates = []
-    this.createOffer()
   }
 
-  async createOffer () {
+  async offer () {
+    console.log('Creating offer ...')
     try {
       const offer = await this.pc.createOffer(this.sdpConstraints())
-      this.pc.setLocalDescription(offer)
+      await this.pc.setLocalDescription(offer)
+      console.log('Done creating offer. Sending...')
+      sendMessage('offer', offer)
     } catch (e) {
       console.error('Creating offer failed. Reason: ', e)
     }
@@ -17,46 +18,54 @@ class Peer {
 
   onicecandidate (event) {
     if (event.candidate) {
-      this.iceCandidates.push({
-        type: 'candidate',
+      sendMessage('candidate', {
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         foundation: event.candidate.foundation
       })
-    } else {
-      sendMessage('ice', this.iceCandidates)
-      this.iceCandidates = []
     }
   }
 
-  // onIceCandidates (data) {
-  //   if (data.type === 'offer') {
-  //     this.pc.createAnswer(this.onLocalSessionCreated)
-  //   }
-  //   const peer = this
-  //   this.pc.setRemoteDescription(new RTCSessionDescription(data))
-  //     .then(peer.addRemoteIceCandidates(data))
-  //     .catch(console.error('Error setting remote description!'))
-  // }
+  async onOffer (data) {
+    try {
+      console.log('Got offer, setting remote description')
+      await this.pc.setRemoteDescription(new RTCSessionDescription(data))
+      console.log('Set remote description called')
+      const answer = await this.pc.createAnswer()
+      console.log('created answer ', answer)
+      this.pc.setLocalDescription(answer)
+      console.log('Set local description', answer)
+      sendMessage('answer', answer)
+    } catch (e) {
+      console.error('Error while creating answer ', e)
+    }
+  }
 
-  // addRemoteIceCandidates (data) {
-  //   console.log('Adding remote ice candidates and creating answer')
-  //   data.iceCandidates.forEach((ic) => {
-  //     const candidate = new RTCIceCandidate({
-  //       sdpMLineIndex: ic.label,
-  //       sdpMid: ic.id,
-  //       candidate: ic.candidate
-  //     })
-  //     this.pc.addIceCandidate(candidate)
-  //       .then(() => console.log('Added ice candidate'))
-  //       .catch(e => console.error('Error: adding ice candidate failed', e))
-  //   })
-  // }
+  async onAnswer (data) {
+    console.log('Got answer. ')
+    this.pc.setRemoteDescription(new RTCSessionDescription(data))
+    console.log('Set remote description')
+  }
 
-  // onLocalSessionCreated () {
+  onRemoteCandidate (data) {
+    const iceCandidate = {
+      candidate: data.candidate,
+      sdpMLineIndex: data.label
+    }
+    this.pc.addIceCandidate(new RTCIceCandidate(iceCandidate))
+      .catch(e => console.error('Error adding ice candidate:', e))
+  }
 
-  // }
+  onSignalingMessage (message) {
+    if (message.type === 'offer') {
+      this.onOffer(message.data)
+    } else if (message.type === 'answer') {
+      this.onAnswer(message.data)
+    } else if (message.type === 'candidate') {
+      this.onRemoteCandidate(message.data)
+    }
+  }
 
   sdpConstraints () {
     return ({
