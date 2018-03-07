@@ -29,7 +29,6 @@ function onUserLeft (data) {
 }
 
 function onMessage (data) {
-  console.log('got data ', data)
   peer.onSignalingMessage(data)
 }
 
