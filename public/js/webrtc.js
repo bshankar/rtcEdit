@@ -1,15 +1,15 @@
 class Peer {
   constructor () {
     this.pc = new RTCPeerConnection(servers)
-    this.createDataChannel = createDataChannel.bind(this)
     this.pc.onicecandidate = event => this.onicecandidate(event)
     this.pc.ondatachannel = onDataChannel.bind(this)
-}
+    this.createDataChannel = createDataChannel.bind(this)
+  }
 
   async offer () {
     console.log('Creating offer ...')
     try {
-      this.dataChannel = this.createDataChannel(docId, socket.id)
+      this.createDataChannel(docId, socket.id)
       const offer = await this.pc.createOffer(this.sdpConstraints())
       await this.pc.setLocalDescription(offer)
       console.log('Done creating offer. Sending...')

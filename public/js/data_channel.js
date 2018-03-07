@@ -1,38 +1,45 @@
-const dataChannelOptions = {
+const options = {
   reliable: true,
   maxPacketLifeTime: 3000 // ms
 }
 
+function onDCMessage (event, channel) {
+  console.log('data channel: MESSAGE', event.data)
+}
+
+function onDCError (event, channel) {
+  console.error('data channel: ERROR: ', event)
+}
+
+function onDCOpen (channel) {
+  console.log('data channel: OPEN')
+  channel.send('Hello World!')
+}
+
+function onDCClose (channel) {
+  console.log('data channel: CLOSE')
+}
+
+function addHandlers (channel) {
+  console.log('data channel: ADD HANDLERS')
+  channel.onopen = () => onDCOpen(channel)
+  channel.onclose = () => onDCClose(channel)
+  channel.onmessage = (event) => onDCMessage(event, channel)
+  channel.onerror = (event) => onDCError(event, channel)
+}
+
 function createDataChannel (docId, userId) {
-  const dataChannel = this.pc.createDataChannel(docId + userId)
-  console.log('CREATE data channel')
-
-  dataChannel.onerror = function (error) {
-    console.error('Data Channel Error:', error)
-  }
-
-  dataChannel.onmessage = function (event) {
-    console.log('Got Data Channel Message:', event.data)
-  }
-
-  dataChannel.onopen = function () {
-    console.log('Data channel opened!!')
-    dataChannel.send('Hello World!')
-  }
-
-  dataChannel.onclose = function () {
-    console.log('The Data Channel is Closed')
-  }
-  return dataChannel
+  this.dataChannel = this.pc.createDataChannel(docId + userId, options)
+  console.log('data channel: CREATE')
+  addHandlers(this.dataChannel)
 }
 
 function onDataChannel (event) {
-  console.log('CREATE data channel @reciever !!')
+  console.log('CREATE: data channel @reciever !!')
   this.dataChannel = event.channel
-  this.dataChannel.onopen = () => {
-    console.log('OPEN data channel @reciever !!')
-  }
-  this.dataChannel.onmessage = function (event) {
-    console.log('Got message: ', event.data)
-  }
+  addHandlers(this.dataChannel)
+}
+
+function destroyDataChannel () {
+
 }
