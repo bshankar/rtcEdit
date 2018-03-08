@@ -18,6 +18,7 @@ function onDCOpen (channel) {
 
 function onDCClose (channel) {
   console.log('data channel: CLOSE')
+  this.dataChannel = null
 }
 
 function addHandlers (channel) {
@@ -35,7 +36,7 @@ function createDataChannel (docId, userId) {
 }
 
 function onDataChannel (event) {
-  console.log('CREATE: data channel @reciever !!')
+  console.log('data channel: DISCOVER')
   this.dataChannel = event.channel
   addHandlers(this.dataChannel)
 }
