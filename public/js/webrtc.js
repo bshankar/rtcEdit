@@ -1,5 +1,6 @@
 class Peer {
-  constructor () {
+  constructor (to) {
+    this.to = to
     this.pc = new RTCPeerConnection(servers)
     this.pc.onicecandidate = event => this.onicecandidate(event)
     this.pc.ondatachannel = onDataChannel.bind(this)
@@ -12,8 +13,8 @@ class Peer {
       this.createDataChannel(docId, socket.id)
       const offer = await this.pc.createOffer(this.sdpConstraints())
       await this.pc.setLocalDescription(offer)
-      console.log('Done creating offer. Sending...')
-      sendMessage('offer', offer)
+      console.log('Done creating offer. Sending to ', this.to)
+      sendMessage('offer', offer, this.to)
     } catch (e) {
       console.error('Creating offer failed. Reason: ', e)
     }
@@ -26,7 +27,7 @@ class Peer {
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         foundation: event.candidate.foundation
-      })
+      }, this.to)
     }
   }
 
@@ -39,7 +40,7 @@ class Peer {
       console.log('created answer ', answer)
       this.pc.setLocalDescription(answer)
       console.log('Set local description', answer)
-      sendMessage('answer', answer)
+      sendMessage('answer', answer, this.to)
     } catch (e) {
       console.error('Error while creating answer ', e)
     }
@@ -81,5 +82,3 @@ class Peer {
     })
   }
 }
-
-const peer = new Peer()
