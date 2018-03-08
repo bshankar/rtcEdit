@@ -31,17 +31,20 @@ function onUserJoined (data) {
 
 function onUserLeft (data) {
   renderUsers(data.users)
-  // close connection with the left user
-  // delete it from peers
+  Object.keys(peers).filter(e => data.users.indexOf(e) === -1)
+    .forEach(u => {
+      peers[u].pc.close()
+      delete peers[u]
+    })
 }
 
 function onMessage (data) {
-  console.log('Got message', data)
   peers[data.from].onSignalingMessage(data)
 }
 
 function onQuit (data) {
   socket.emit('leave room', {docId: docId})
+  Object.values(peers).forEach(p => p.pc.close())
 }
 
 function sendMessage (type, data, to) {
