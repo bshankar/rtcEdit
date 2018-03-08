@@ -8,12 +8,10 @@ class Peer {
   }
 
   async offer () {
-    console.log('Creating offer ...')
     try {
       this.createDataChannel(docId, socket.id)
       const offer = await this.pc.createOffer(this.sdpConstraints())
       await this.pc.setLocalDescription(offer)
-      console.log('Done creating offer. Sending to ', this.to)
       sendMessage('offer', offer, this.to)
     } catch (e) {
       console.error('Creating offer failed. Reason: ', e)
@@ -33,13 +31,9 @@ class Peer {
 
   async onOffer (data) {
     try {
-      console.log('Got offer, setting remote description')
       await this.pc.setRemoteDescription(new RTCSessionDescription(data))
-      console.log('Set remote description called')
       const answer = await this.pc.createAnswer()
-      console.log('created answer ', answer)
       this.pc.setLocalDescription(answer)
-      console.log('Set local description', answer)
       sendMessage('answer', answer, this.to)
     } catch (e) {
       console.error('Error while creating answer ', e)
@@ -47,9 +41,7 @@ class Peer {
   }
 
   async onAnswer (data) {
-    console.log('Got answer. ')
     this.pc.setRemoteDescription(new RTCSessionDescription(data))
-    console.log('Set remote description')
   }
 
   onRemoteCandidate (data) {
