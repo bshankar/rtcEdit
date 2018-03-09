@@ -25,7 +25,7 @@ function onUserJoined (data) {
     })
   } else if (data.users.length > 1) {
     const remoteUser = data.users.slice(-1)[0]
-    peers[data.users.slice(-1)[0]] = new Peer(remoteUser)
+    peers[remoteUser] = new Peer(remoteUser)
   }
 }
 
