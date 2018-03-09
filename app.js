@@ -17,7 +17,7 @@ app.get('/', function (req, res) {
 })
 
 app.get('/generate', function (req, res) {
-  res.redirect('/' + uuidv4())
+  res.redirect('/' + uuidv4().replace(/-*/g, ''))
 })
 
 app.get('/:docId', function (req, res) {
