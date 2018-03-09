@@ -40,7 +40,3 @@ function onDataChannel (event) {
   this.dataChannel = event.channel
   addHandlers(this.dataChannel)
 }
-
-function destroyDataChannel () {
-
-}
