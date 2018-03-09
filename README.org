@@ -1,0 +1,15 @@
+* RtcEdit
+  An online collaborative text editor powered by WebRTC. This is a
+  *work in progress* and currently unusable.
+
+* Current State [5/8]
+  - [X] Multiple documents, basic routing
+  - [X] Signaling with =socket.io=
+  - [X] WebRTC handshake
+  - [X] Data channels between two users
+  - [X] Mesh Model to connect multiple users on the same document
+  - [ ] Test from other networks
+  - [ ] Implement Operational transformation (with [[https://github.com/Operational-Transformation/ot.js/][ot.js]]?)
+  - [ ] Front end work
+    - [ ] Integrate a text editor
+    - [ ] Aesthetics
